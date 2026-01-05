@@ -3,3 +3,4 @@
 **/.next
 **/hnswlib-index
 backend-rag-api/app/api/rag/route.ts
+compose.md
