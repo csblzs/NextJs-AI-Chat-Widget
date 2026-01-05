@@ -1,94 +1,116 @@
-AiChat — Next.js RAG API + Embeddable Chat Widget
+🤖 AiChat
+🗂️ Structure
 
-This repository contains a Next.js-based RAG (Retrieval-Augmented Generation) backend API and an embeddable frontend chat widget.
+The repository is split into two main parts: a backend API and a frontend widget.
 
-Repository Structure
 .
-├── backend-rag-api     # API routes, document indexing, RAG logic
-└── frontend-widget    # Embeddable chat UI (iframe / script-based)
+├── backend-rag-api/      # API routes, document indexing, RAG logic
+└── frontend-widget/     # Embeddable chat UI (Next.js)
 
-Prerequisites
+⚙️ Prerequisites
 
-Docker (recommended)
+Before getting started, make sure the following tools are available:
 
-Node.js 20+ (for local development)
+Docker + Docker Compose (recommended for easiest setup)
+
+Node.js 20+ (required for local development)
 
 Linux build tools (build-essential, python3, etc.)
-required for building the native hnswlib-node module
+Required for compiling the native hnswlib-node dependency
 
-Environment Variables
+🔐 Configuration (.env)
 
-Required:
+Environment variables are required for the backend and optional for the frontend.
 
+Required (backend)
 GEMINI_API_KEY=your_api_key_here
 
-
-Required only for the RAG endpoint:
-
+Required only if you use the RAG endpoint (/api/rag)
 COHERE_API_KEY=your_api_key_here
 
-
-Optional:
-
+Optional (frontend)
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
-Quick Start (Docker)
 
-Build and start the backend:
+⚠️ Security note
+Never commit real API keys to a public repository.
+Use a local .env file and commit an .env.example template instead.
 
+🚀 Quickstart (Docker)
+1️⃣ Start the backend service
+cd backend-rag-api
 docker compose up --build
 
 
-Load and index documents:
+This builds the container and starts the API server.
 
-docker exec rag_api npm run load-data
+2️⃣ Index the documents
+docker exec -it rag_api npm run load-data
 
 
-⚠️ The RAG API will not return valid results until indexing is completed.
+❗ Important
+Document-based retrieval will only work after indexing has completed.
 
-Local Development
+🧑‍💻 Local development
 Backend
+
+Install dependencies and start the development server:
+
 cd backend-rag-api
 npm install
 npm run dev
+
+
+Run indexing locally:
+
 npm run load-data
 
-Frontend Widget
+Frontend widget
 cd frontend-widget
 npm install
 npm run dev
 
-API Endpoints
-Chat (LLM-based response)
+
+The widget can then be embedded or tested locally.
+
+🔌 API endpoints
+
+Base URL: http://localhost:3000
+
+💬 Chat (LLM response)
 
 POST /api/chat
 
-curl -X POST http://localhost:3000/api/chat \
+curl -s http://localhost:3000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{
-    "message": "Hello! How can you help me?"
-  }'
+  -d '{"question":"Hello"}'
 
-RAG (Document-aware response)
+
+Returns a direct LLM response without document retrieval.
+
+📚 RAG (document-aware response)
 
 POST /api/rag
 
-curl -X POST http://localhost:3000/api/rag \
+curl -s http://localhost:3000/api/rag \
   -H "Content-Type: application/json" \
-  -d '{
-    "query": "What is described in the documentation?"
-  }'
+  -d '{"question":"What is described in the documentation?"}'
 
-Troubleshooting
+
+Uses indexed documents to generate grounded, context-aware answers.
+
+🛠️ Troubleshooting
+
+Common issues and their solutions:
 
 CORS errors
-Verify the NEXT_PUBLIC_BASE_URL value and backend CORS configuration.
+Verify NEXT_PUBLIC_BASE_URL and backend CORS configuration.
 
 Missing index
-The /api/rag endpoint requires running npm run load-data beforehand.
+Make sure npm run load-data has been executed before calling /api/rag.
 
 Native build errors (hnswlib-node)
-Ensure all required Linux build tools are installed.
+Ensure Linux build tools (build-essential, python3, etc.) are installed.
 
-Invalid or missing environment variables
-Confirm that GEMINI_API_KEY (and COHERE_API_KEY for RAG) are correctly set at runtime.
+Missing environment variables
+GEMINI_API_KEY is required; /api/rag also requires COHERE_API_KEY.
